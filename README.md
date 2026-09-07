@@ -36,7 +36,7 @@ luna_explorer와 sol_executor의 책임, 모델, 추론 수준을 요약해 주�
 
 `~`는 사용자 홈 디렉터리입니다. `CODEX_HOME`을 별도로 설정했다면 전역 경로는 그 위치를 기준으로 적용하세요. `AGENTS.override.md`가 있으면 해당 범위의 `AGENTS.md`보다 우선하므로 그 지침도 함께 확인하세요.
 
-Codex는 역할 TOML을 자동으로 발견합니다. 단, 이 저장소의 `agents/`와 `instructions/`는 배포용 경로이므로 clone만으로 다른 프로젝트에 적용되지는 않습니다. 역할 파일에는 **사용자 정의 developer instructions**가 들어 있으며 플랫폼의 전체 시스템 프롬프트를 담은 것은 아닙니다. [공식 역할 설정 안내](https://learn.chatgpt.com/docs/agent-configuration/subagents), [AGENTS.md 안내](https://learn.chatgpt.com/docs/agent-configuration/agents-md)
+Codex는 역할 TOML을 `~/.codex/agents/` 또는 프로젝트 `.codex/agents/`에 복사한 뒤 해당 경로에서 발견합니다. 이 저장소의 `agents/`와 `instructions/`는 배포용 경로이므로 clone만으로 다른 프로젝트에 적용되지는 않습니다. 역할 파일에는 **사용자 정의 developer instructions**가 들어 있으며 플랫폼의 전체 시스템 프롬프트를 담은 것은 아닙니다. [공식 역할 설정 안내](https://learn.chatgpt.com/docs/agent-configuration/subagents), [AGENTS.md 안내](https://learn.chatgpt.com/docs/agent-configuration/agents-md)
 
 ## 동시 실행 한도는 10 이상을 추천합니다
 
@@ -61,7 +61,7 @@ max_concurrent_threads_per_session = 10
 
 이는 원본의 사용값을 보존한 예시입니다. 자신의 환경에서 사용할 수 있는 모델과 지원 추론 수준으로 각 TOML의 `model`, `model_reasoning_effort`를 함께 조정하세요. 이름에 포함된 luna/sol은 역할 식별자이므로 모델만 바꿀 때 역할 이름까지 바꿀 필요는 없습니다. 역할 이름을 바꾼다면 공통 지침과 예시의 참조도 같이 수정하세요.
 
-역할 파일에서 모델·추론 수준을 지정하므로 부모 모델을 그대로 물려받는 구성과 다를 수 있습니다. 읽기 전용 탐색은 역할 지침으로 제한하며 별도의 sandbox 설정은 포함하지 않습니다. 실행 권한은 적용 환경의 설정을 따릅니다.
+역할 파일에서 모델·추론 수준을 지정하므로 부모 모델을 그대로 물려받는 구성과 다를 수 있습니다. 읽기 전용 탐색은 역할 지침상의 제한이며, 쓰기를 기술적으로 차단하는 별도의 sandbox 설정은 포함하지 않습니다. 실행 권한은 적용 환경의 설정을 따릅니다.
 
 ## 원본에서 바꾼 부분
 
@@ -75,6 +75,12 @@ max_concurrent_threads_per_session = 10
 ## 확인 환경과 검증 범위
 
 2026-09-07, Windows의 `codex-cli 0.151.0` 및 당시 공식 문서를 기준으로 정리했습니다. TOML 문법, 필수 역할 필드, 이름 참조, 내부 링크와 개인 경로 누출의 정적 검사를 통과했습니다. 정적 검사 통과는 실제 역할 로딩이나 모델 실행 성공을 보장하지 않습니다. 공개본을 설치한 별도 세션에서의 역할 실행 및 토큰 절감 비교 실험은 아직 수행하지 않았습니다.
+
+설정 문법과 필수 필드는 저장소 루트에서 Python 3.11 이상으로 아래처럼 다시 확인할 수 있습니다. 이 명령은 역할 실행이나 개인정보·문서 검토를 대신하지 않습니다.
+
+```sh
+python -c "import pathlib,tomllib; p=pathlib.Path('.'); c=tomllib.loads((p/'config.example.toml').read_text(encoding='utf-8')); assert c['agents']['max_concurrent_threads_per_session']>=10; roles=[tomllib.loads(f.read_text(encoding='utf-8')) for f in (p/'agents').glob('*.toml')]; assert {r['name'] for r in roles}=={'luna_explorer','sol_executor'}; assert all(all(k in r for k in ('name','description','developer_instructions')) for r in roles); print('PASS')"
+```
 
 적용 후에는 작은 읽기 전용 작업을 `luna_explorer`에 맡겨 실제 선택된 역할과 반환 형식을 확인하는 것을 권합니다. 관련 예시는 [delegation.md](examples/delegation.md)에 있습니다.
 
