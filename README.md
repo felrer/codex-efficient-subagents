@@ -1,70 +1,38 @@
 # Codex Efficient Subagents
 
-Codex에서 불필요한 위임, 맥락 전달, 중복 탐색을 줄이기 위해 사용하는 지침과 subagent 역할 설정입니다. 작은 일은 직접 처리하고, 독립적인 작업은 범위를 정해 맡기며, 결과는 근거와 함께 짧게 돌려받도록 구성했습니다.
+Codex의 작업 위임과 중복 탐색을 줄이기 위한 프롬프트와 subagent 설정입니다. 작은 작업은 직접 처리하고, 독립적인 작업만 나눠 맡기는 방식입니다.
 
 ## 구성
 
-| 파일 | 역할 |
+| 파일 | 용도 |
 |---|---|
-| [AGENTS.snippet.md](instructions/AGENTS.snippet.md) | 부모의 위임 판단, 작업 전달, 결과 통합 및 공통 읽기·출력 규칙 |
-| [luna_explorer.toml](agents/luna_explorer.toml) | 범위가 정해진 읽기 전용 탐색과 근거 수집 |
-| [sol_executor.toml](agents/sol_executor.toml) | 동작과 범위가 합의된 구현·검증 |
-| [config.example.toml](config.example.toml) | subagent 활성화와 동시 실행 한도 예시 |
-| [delegation.md](examples/delegation.md) | 직접 처리·위임 판단과 작업 전달·반환 예시 |
+| [AGENTS.snippet.md](instructions/AGENTS.snippet.md) | 작업 위임, 맥락 전달, 결과 통합 지침 |
+| [luna_explorer.toml](agents/luna_explorer.toml) | 코드 탐색과 근거 수집 |
+| [sol_executor.toml](agents/sol_executor.toml) | 구현과 검증 |
+| [config.example.toml](config.example.toml) | subagent 활성화와 동시 실행 한도 |
+| [delegation.md](examples/delegation.md) | 작업 위임 예시 |
 
-요구사항 해석, 구조 결정, 공유 인터페이스와 최종 검수는 부모가 담당합니다. 자식은 맡은 범위에 집중하고 추가 subagent를 만들지 않습니다.
+작업 방향과 최종 판단은 메인 에이전트가 맡고, subagent는 전달받은 범위 안에서 작업합니다.
 
-## 적용 방법
+## 사용법
 
-1. 이 저장소를 다운로드하거나 clone합니다.
-2. `instructions/AGENTS.snippet.md` 내용을 기존 전역 `~/.codex/AGENTS.md` 또는 적용할 프로젝트의 `AGENTS.md`에 병합합니다. 같은 내용이 이미 있다면 중복을 정리합니다. 파일 전체를 덮어쓰지 마세요.
-3. 역할 TOML 두 개를 전역 `~/.codex/agents/` 또는 프로젝트 `.codex/agents/`에 복사합니다. 같은 이름의 역할이 있다면 내용을 비교해 병합합니다.
-4. `config.example.toml`의 설정을 전역 `~/.codex/config.toml` 또는 프로젝트 `.codex/config.toml`에 병합합니다. 기존 `[agents]`가 있으면 그 섹션의 값을 수정하고, 같은 섹션을 추가로 만들지 않습니다. 기존 `max_threads`가 있으면 중복 설정 대신 새 키로 정리합니다.
-5. 새 Codex 세션에서 아래 확인 요청을 실행하고, 표시되는 역할과 모델 설정을 확인합니다. 프로젝트 설정의 로딩은 해당 프로젝트에 대한 신뢰 설정에 영향을 받을 수 있습니다.
+저장소를 내려받은 뒤 아래 파일을 기존 Codex 설정에 합치면 됩니다.
 
-```text
-현재 적용된 AGENTS.md와 사용자 정의 subagent 역할을 확인해 주세요.
-luna_explorer와 sol_executor의 책임, 모델, 추론 수준을 요약해 주세요.
-아직 subagent를 실행하거나 파일을 수정하지 마세요.
-```
+| 저장소 파일 | 전역 설정 위치 | 프로젝트별 설정 위치 |
+|---|---|---|
+| `instructions/AGENTS.snippet.md` | `~/.codex/AGENTS.md` | `AGENTS.md` |
+| `agents/*.toml` | `~/.codex/agents/` | `.codex/agents/` |
+| `config.example.toml` | `~/.codex/config.toml` | `.codex/config.toml` |
 
-`~`는 사용자 홈 디렉터리입니다. `CODEX_HOME`을 별도로 설정했다면 전역 경로는 그 위치를 기준으로 적용하세요. `AGENTS.override.md`가 있으면 해당 범위의 `AGENTS.md`보다 우선하므로 그 지침도 함께 확인하세요.
+기존 파일은 유지하고 필요한 내용을 병합합니다. `config.toml`에 `[agents]`가 있으면 해당 항목에 합칩니다. `~`는 사용자 홈 폴더이며, `CODEX_HOME`을 따로 지정한 경우에는 그 경로를 사용합니다.
 
-Codex는 역할 TOML을 `~/.codex/agents/` 또는 프로젝트 `.codex/agents/`에 복사한 뒤 해당 경로에서 발견합니다. 이 저장소의 `agents/`와 `instructions/`는 배포용 경로이므로 clone만으로 다른 프로젝트에 적용되지는 않습니다. 역할 파일에는 **사용자 정의 developer instructions**가 들어 있으며 플랫폼의 전체 시스템 프롬프트를 담은 것은 아닙니다. [공식 역할 설정 안내](https://learn.chatgpt.com/docs/agent-configuration/subagents), [AGENTS.md 안내](https://learn.chatgpt.com/docs/agent-configuration/agents-md)
-
-## 동시 실행 한도는 10 이상을 추천합니다
-
-독립적인 작업을 병렬로 처리할 여유를 두기 위해 **subagent 동시 실행 한도를 적어도 10 이상으로 올리는 것을 추천합니다.** 예시 설정은 10입니다.
-
-```toml
-[agents]
-enabled = true
-max_concurrent_threads_per_session = 10
-```
-
-이 값은 부모를 제외하고 동시에 열 수 있는 자식 에이전트 스레드의 상한입니다. 항상 10개를 실행하거나 작업을 10개로 쪼개라는 뜻은 아닙니다. 실제 위임 수는 독립적인 작업의 수와 조정 비용에 따라 정합니다. 작은 조회나 수정은 직접 처리합니다.
-
-10 이상이라는 권장은 이 저장소의 운영 제안이며 OpenAI의 권장 최소값이나 토큰 절감의 최적값이 아닙니다. 병렬 위임은 전체 토큰 사용량을 늘릴 수도 있습니다. [설정과 동작의 공식 설명](https://learn.chatgpt.com/docs/agent-configuration/subagents)
+**subagent 동시 실행 한도는 8 이상을 권장합니다.**
 
 ## 모델과 추론 수준
 
-| 역할 | 예시 모델 | 추론 수준 |
+| 역할 | 모델 | 추론 수준 |
 |---|---|---|
 | `luna_explorer` | `gpt-5.6-luna` | `high` |
 | `sol_executor` | `gpt-5.6-sol` | `medium` |
 
-자신의 환경에서 사용할 수 있는 모델과 지원 추론 수준으로 각 TOML의 `model`, `model_reasoning_effort`를 함께 조정하세요. 이름에 포함된 luna/sol은 역할 식별자이므로 모델만 바꿀 때 역할 이름까지 바꿀 필요는 없습니다. 역할 이름을 바꾼다면 공통 지침과 예시의 참조도 같이 수정하세요.
-
-역할 파일에서 모델·추론 수준을 지정하므로 부모 모델을 그대로 물려받는 구성과 다를 수 있습니다. 읽기 전용 탐색은 역할 지침상의 제한이며, 쓰기를 기술적으로 차단하는 별도의 sandbox 설정은 포함하지 않습니다. 실행 권한은 적용 환경의 설정을 따릅니다.
-
-## 설정 확인
-
-저장소 루트에서 Python 3.11 이상으로 TOML 문법과 필수 필드를 확인할 수 있습니다. 이 검사는 실제 역할 로딩이나 모델 실행 성공을 보장하지 않습니다.
-
-```sh
-python -c "import pathlib,tomllib; p=pathlib.Path('.'); c=tomllib.loads((p/'config.example.toml').read_text(encoding='utf-8')); assert c['agents']['max_concurrent_threads_per_session']>=10; roles=[tomllib.loads(f.read_text(encoding='utf-8')) for f in (p/'agents').glob('*.toml')]; assert {r['name'] for r in roles}=={'luna_explorer','sol_executor'}; assert all(all(k in r for k in ('name','description','developer_instructions')) for r in roles); print('PASS')"
-```
-
-적용 후에는 작은 읽기 전용 작업을 `luna_explorer`에 맡겨 실제 선택된 역할과 반환 형식을 확인하는 것을 권합니다. 관련 예시는 [delegation.md](examples/delegation.md)에 있습니다.
-
-OpenAI 공식 프리셋은 아니며, 토큰 절감 효과를 비교 실험으로 검증하지 않았습니다. 변경 이력은 [CHANGELOG.md](CHANGELOG.md)를 참고하세요.
+모델과 추론 수준은 각 역할 파일의 `model`, `model_reasoning_effort`에서 변경할 수 있습니다.

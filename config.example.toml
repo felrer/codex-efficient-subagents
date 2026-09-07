@@ -2,4 +2,4 @@
 # This is a concurrency ceiling, not a target number of agents to launch.
 [agents]
 enabled = true
-max_concurrent_threads_per_session = 10
+max_concurrent_threads_per_session = 8
