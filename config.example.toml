@@ -1,0 +1,5 @@
+# Merge into an existing [agents] section; do not duplicate the section.
+# This is a concurrency ceiling, not a target number of agents to launch.
+[agents]
+enabled = true
+max_concurrent_threads_per_session = 10
