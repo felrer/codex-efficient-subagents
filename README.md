@@ -172,7 +172,7 @@ docs/work/AA-01-search-filter/
 
 | 항목 | 기본값과 변경 위치 |
 |---|---|
-| 탐색 역할 | `luna_explorer`: `gpt-5.6-luna`, `high` |
+| 탐색 역할 | `luna_explorer`: `gpt-5.6-luna`, `xhigh` |
 | 구현 역할 | `sol_executor`: `gpt-5.6-sol`, `medium` |
 | 동시 실행 한도 | `config.example.toml`의 8. 실제 작업량과 비용에 맞게 조정 |
 | 작업 문서 위치 | 프로젝트 `docs/README.md`의 `## Work Artifacts` 아래 `Work directory` |
