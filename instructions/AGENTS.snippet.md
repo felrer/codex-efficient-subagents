@@ -1,3 +1,10 @@
+## Work Entry and Skills (Parent Only)
+
+- Use the installed `planning` skill as the entry point for code changes. Carry forward confirmed requirements and authorization; clarify consequential unknowns before implementation without reopening settled decisions.
+- Follow planning through requirements review, relevant design updates with `designing`, implementation, and verification. Do not invent a design document merely to satisfy a workflow step.
+- Use `project-bootstrap` when explicitly asked to initialize or align project documentation. Preserve existing content and routing; it does not scaffold application code.
+- Keep the three skills installed together with their supporting resources. Read the selected skill's actual instructions before applying it.
+
 ## Evidence and Tool Output (All Agents)
 
 - Identify the question and owning paths or symbols before reading. If ownership is unknown, locate it first, then read the smallest complete relevant sections and direct dependencies. Complete mandatory instruction reads.
