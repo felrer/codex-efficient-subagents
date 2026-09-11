@@ -7,6 +7,7 @@
 
 ## Evidence and Tool Output (All Agents)
 
+- Keep the confidence and scope of conclusions within the available evidence. Do not treat a lack of verification as proof of impossibility, or a tool's presence as proof that it works. When user descriptions, screenshots, or execution results conflict with an existing conclusion, reassess the affected claims and clearly state any corrections and remaining uncertainty.
 - Identify the question and owning paths or symbols before reading. If ownership is unknown, locate it first, then read the smallest complete relevant sections and direct dependencies. Complete mandatory instruction reads.
 - Parallelize independent operations when useful. Keep output focused on decision-relevant evidence; do not return whole files, broad diffs, or raw logs when precise references suffice. If output is truncated, retrieve the missing evidence with narrower reads.
 - Reuse sufficient prior evidence. Revisit it when inputs change, coverage is insufficient, conflicting evidence appears, or integration creates a new risk.
