@@ -1,6 +1,6 @@
 # Codex Efficient Subagents
 
-Codex에서 **요구사항 정리 → 설계 → 구현·검증**을 이어 가고, 독립적인 작업을 subagent에 맡기는 개인 작업 체계를 공유합니다. 공통 지침, 역할 설정, 세 가지 스킬, 프로젝트 문서 템플릿을 함께 제공합니다.
+Codex에서 **요구사항 정리 → 설계 → 구현·검증**을 이어 가고, 독립적인 작업을 subagent에 맡기는 개인 작업 체계를 공유합니다. 공통 지침, 역할 설정, 세 가지 스킬, 프로젝트 문서 템플릿과 공용 작업 Playbook을 함께 제공합니다.
 
 개인 Obsidian Vault나 Google Drive 없이 설치하고 프로젝트 작업을 시작할 수 있습니다. 애플리케이션 코드나 외부 서비스 연결은 포함하지 않습니다.
 
@@ -41,6 +41,7 @@ Codex CLI·IDE에서는 `$planning`으로 직접 지정할 수도 있습니다. 
 | `planning` | 요구사항 확인부터 구현·평가까지 작업 진행 | [SKILL.md](skills/planning/SKILL.md) |
 | `designing` | 승인된 요구사항을 지속적으로 관리할 설계로 구체화 | [SKILL.md](skills/designing/SKILL.md) |
 | `project-bootstrap` | 문서 진입점, 작업 저장 위치, playbook 안내 준비 | [SKILL.md](skills/project-bootstrap/SKILL.md) |
+| 작업 Playbook | 재사용, 레거시 호환·마이그레이션, 파일 구조, 검증과 정리의 공통 실행 기준 | [work.md](skills/project-bootstrap/assets/playbooks/work.md) |
 
 짧은 조회나 작은 수정은 메인 에이전트가 직접 처리합니다. 독립적인 작업을 나누는 이점이 있을 때 위임하며, 동시 실행 한도를 채우기 위해 작업을 나누지 않습니다. 전달 형식은 [위임 예시](examples/delegation.md)를 참고하세요.
 
@@ -95,7 +96,7 @@ Codex를 다시 열고 다음을 확인합니다.
 
 > 모든 코드 수정 작업의 진입점입니다. 목표, 해결 방향, 동작 또는 범위에 미확정 사항이 있는 문제 해결·개선 요청에서 요구사항 정리, 사용자 승인, 설계 문서 수정, 구현과 평가까지 진행합니다.
 
-요청과 기존 근거를 확인해 목표·제약·성공 조건을 정리합니다. 사용자 확인이 필요하거나 내용이 많으면 설정된 작업 위치에 brief를 남깁니다. 승인 후 필요한 설계 변경을 연결하고 구현·검증까지 진행합니다. 작업 위치가 없으면 대화에서 정리합니다.
+요청과 기존 근거를 확인해 목표·제약·성공 조건을 정리합니다. 레거시 코드·테스트·실행 스크립트의 정리 계획과 장기 작업의 파일 배치·관리도 포함합니다. 사용자 확인이 필요하거나 내용이 많으면 설정된 작업 위치에 brief를 남깁니다. 승인 후 필요한 설계 변경을 연결하고 구현·검증·정리 확인까지 진행합니다. 작업 위치가 없으면 대화에서 정리합니다.
 
 파일: [스킬](skills/planning/SKILL.md) · [작업 문서 규칙](skills/planning/references/task-artifacts.md) · [생성 유틸리티](skills/planning/scripts/work_artifacts.py)
 
@@ -109,9 +110,9 @@ Codex를 다시 열고 다음을 확인합니다.
 
 ### project-bootstrap
 
-> Create or align project documentation entry points, configurable work locations with scripted brief/plan creation, and selective project playbook routing. Use when explicitly bootstrapping or normalizing a project; reuse common playbooks with project-specific adaptations when in scope. Do not generate application scaffolding, detailed designs, or task plans.
+> Create or align project documentation entry points, configurable work locations with scripted brief/plan creation, and project playbook routing with the common Work playbook included by default. Use when explicitly bootstrapping or normalizing a project. Do not generate application scaffolding, detailed designs, or task plans.
 
-새 프로젝트에는 최소 문서 구조를 준비하고, 기존 프로젝트에는 내용을 보존하면서 필요한 진입점과 연결을 보완합니다. description은 개인 원문의 표현을 보존했습니다. 그중 `brief/plan` 표현과 달리 배포본의 작업 문서 규칙은 현재 planning의 세션별 번호가 붙은 brief 체계로 통일했습니다.
+새 프로젝트에는 최소 문서 구조와 공용 작업 Playbook을 준비하고, 기존 프로젝트에는 내용을 보존하면서 필요한 진입점과 연결을 보완합니다. 동등한 작업 지침이 있으면 그 문서에 필요한 내용을 통합합니다. description의 `brief/plan` 표현과 달리 배포본의 작업 문서 규칙은 planning의 세션별 번호가 붙은 brief 체계를 사용합니다.
 
 파일: [스킬](skills/project-bootstrap/SKILL.md) · [프로젝트 템플릿](skills/project-bootstrap/assets/project-template/)
 
@@ -143,10 +144,15 @@ docs/
   maps/README.md          # 구현 위치와 관계 안내
   ops/README.md           # 실행·검증·운영 절차 안내
   playbooks/README.md     # 작업 유형별 지침 선택
+  playbooks/work.md       # 공용 작업 지침을 프로젝트에 맞게 적용
   work/README.md          # 작업 기록 사용 규칙
 ```
 
-bootstrap은 문서 진입점을 준비합니다. 상세 설계와 작업 brief는 실제 작업이 생길 때 작성합니다. 공통 playbook 본문은 이 배포에 포함하지 않으며, 필요한 경우 사용자가 제공한 자료에서 해당 프로젝트에 맞는 것만 가져옵니다.
+bootstrap은 문서 진입점과 함께 [공용 작업 Playbook](skills/project-bootstrap/assets/playbooks/work.md)을 기본으로 포함합니다. 사용자가 playbook 본문을 제외한 경우에는 그 범위를 따릅니다. 기존 작업 지침이 있으면 중복 파일을 만들지 않고 해당 소유 문서에 필요한 내용만 통합하며, 프로젝트 router에 연결하고 출처·적용 시점·프로젝트별 조정을 기록합니다. 설치한 bootstrap의 assets에 본문이 포함되어 있어 별도 다운로드나 개인 Vault가 필요하지 않습니다.
+
+작업 Playbook은 승인된 계획에 명시한 레거시 호환만 허용하고, 미명시 시 해당 변경의 목표 스키마로 마이그레이션하도록 합니다. 재사용, 파일 구조 관리, 검증, 대체된 코드·테스트·스크립트의 정리와 완료 기준도 포함합니다. 프로젝트별 데이터 보호·배포 절차와 실행 권한은 계속 해당 프로젝트의 지침을 따릅니다.
+
+상세 설계와 작업 brief는 실제 작업이 생길 때 작성합니다. 다른 공통 playbook은 사용자가 제공하거나 선택한 자료에서 필요한 것만 가져옵니다. 다시 bootstrap을 실행할 때 기존 규칙과 비교해 반영하며 프로젝트별 수정을 자동으로 덮어쓰지 않습니다.
 
 ## 첫 작업부터 완료까지
 

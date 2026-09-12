@@ -1,6 +1,6 @@
 ---
 name: project-bootstrap
-description: "Create or align project documentation entry points, configurable work locations with scripted brief/plan creation, and selective project playbook routing. Use when explicitly bootstrapping or normalizing a project; reuse common playbooks with project-specific adaptations when in scope. Do not generate application scaffolding, detailed designs, or task plans."
+description: "Create or align project documentation entry points, configurable work locations with scripted brief/plan creation, and project playbook routing with the common Work playbook included by default. Use when explicitly bootstrapping or normalizing a project. Do not generate application scaffolding, detailed designs, or task plans."
 ---
 
 # Project Bootstrap
@@ -34,13 +34,21 @@ When a new project requests a different work location, place the work README the
 
 The playbook router gives short applicability descriptions so agents select only matching guidance by work type. Read linked ops sections only when the chosen work needs them; do not preload every playbook or its references. Root instructions should route to it, not inline every playbook. Applicable guidance covers how work is performed, verified, and finished; exact supported commands remain in `ops/` or established owners and are linked.
 
-Bootstrap creates the router, not fabricated detailed playbooks. Import playbooks only when the user supplies or selects a source and includes importing in scope. Select only relevant sources, copy them into the project, and adapt them to verified project constraints and operational links. Record source, source revision or date, and meaningful local adaptations. Project copies are locally maintained; do not automatically overwrite them from common sources or write project-specific changes back upstream.
+Include the common [Work playbook](assets/playbooks/work.md) by default when bootstrapping or aligning a project, unless the user explicitly limits the task to exclude playbook content. Read the bundled source; no personal Vault or external source is required. This default is part of bootstrap scope; do not request separate import approval.
+
+If the project has no equivalent owner, import the source as `docs/playbooks/work.md` and adapt it to verified project constraints and existing documentation, testing, and deployment owners. If equivalent work guidance exists, compare the common source with that owner, preserve valid local constraints, and integrate only missing applicable guidance into the existing owner. Do not create a duplicate body or silently replace conflicting project policy; resolve material conflicts within the user's authorized scope.
+
+Register the resulting owner in `docs/playbooks/README.md` with applicability for implementation, fixes, refactoring, and migration. Update the template's empty-registration notice when registering it. Record the source identifier `codex-efficient-subagents/skills/project-bootstrap/assets/playbooks/work.md`, source revision or import date, and meaningful local adaptations in the project's playbook maintenance section. Do not fabricate operational links or commands when a project has no corresponding owner.
+
+Import other common playbooks only when relevant and in scope. Project copies are locally maintained; do not automatically overwrite them from common sources or write project-specific changes back upstream. On subsequent bootstrap runs, compare before editing and avoid duplicate rules, registrations, or provenance entries.
 
 Improve common sources only within an authorized editing task, extracting reusable lessons without carrying project-specific assumptions. If a source is unavailable, report that limitation and complete independent bootstrap work.
 
 ## Verification And Completion
 
 Check that all seven entry points exist or route through agreed existing equivalents, links resolve, configured destinations agree, and empty-registration notices match reality. Verify that numbered-brief session rules are consistent and that playbooks route to operational owners without duplicating commands.
+
+Verify that common Work guidance is present in the imported file or the existing owner, that the playbook router points to that owner, and that provenance and local adaptations are recorded. Report explicit scope exclusions, unavailable sources, or unresolved policy conflicts instead of claiming the default inclusion is complete.
 
 Do not create application code, runtime configuration, detailed architecture, code maps, operational procedures, task artifacts, or placeholder files just to complete bootstrap. Use applicable existing documentation checks; do not add a validator solely for bootstrap.
 
