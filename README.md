@@ -2,9 +2,25 @@
 
 Codex에서 **요구사항 정리 → 설계 → 구현·검증**을 이어 가고, 독립적인 작업을 subagent에 맡기는 개인 작업 체계를 공유합니다. 공통 지침, 역할 설정, 세 가지 스킬, 프로젝트 문서 템플릿과 공용 작업 Playbook을 함께 제공합니다.
 
-개인 Obsidian Vault나 Google Drive 없이 설치하고 프로젝트 작업을 시작할 수 있습니다. 애플리케이션 코드나 외부 서비스 연결은 포함하지 않습니다.
+개인 Obsidian Vault나 Google Drive 없이 설치하고 프로젝트 작업을 시작할 수 있습니다. Git 소스 트리에는 애플리케이션 코드가 없으며, Azrael 앱 빌드는 별도 Release 자산으로 배포합니다.
 
-[전체 흐름](#전체-흐름) · [구성 요소](#구성-요소와-책임) · [빠른 설치](#빠른-설치) · [스킬 description](#스킬-description) · [프로젝트 시작](#프로젝트-시작하기) · [작업 예시](#첫-작업부터-완료까지) · [사용자별 조정](#사용자별-조정) · [문제 해결](#업데이트와-문제-해결)
+[Azrael 설치](#azrael-설치-windows-x64) · [전체 흐름](#전체-흐름) · [구성 요소](#구성-요소와-책임) · [Codex 지침 설치](#빠른-설치) · [스킬 description](#스킬-description) · [프로젝트 시작](#프로젝트-시작하기) · [작업 예시](#첫-작업부터-완료까지) · [사용자별 조정](#사용자별-조정) · [문제 해결](#업데이트와-문제-해결)
+
+## Azrael 설치 (Windows x64)
+
+[최신 Azrael Release](https://github.com/felrer/codex-efficient-subagents/releases/tag/azrael-2026-09-29)는 독립 VS Code 호스트, 엔진, OpenAI/Devin provider 실행 파일을 포함합니다. Windows x64 로컬 환경에서 VS Code 1.96.2 이상, PowerShell 7, Node.js 22.18 이상, Git을 준비하고 `code`, `node`, `pwsh` 명령을 실행할 수 있게 합니다. 설치에는 약 2 GB의 여유 공간과 GitHub 다운로드 연결이 필요합니다.
+
+```powershell
+git clone https://github.com/felrer/codex-efficient-subagents.git
+cd codex-efficient-subagents
+pwsh -NoProfile -File ./azrael/install.ps1
+```
+
+설치기는 Release ZIP을 다운로드하고 SHA-256을 확인한 뒤 `%LOCALAPPDATA%/Azrael/releases/`에 풉니다. 현재 PC의 Node 실행 파일과 경로를 검증해 VSIX 설정을 만든 다음 `code --install-extension`으로 `azrael-ex-local.azrael`을 설치합니다. VS Code에서 **Developer: Reload Window**를 실행하고 사이드바의 **azrael**을 엽니다. 첫 사용 시 Azrael 계정으로 로그인합니다. Azrael 상태는 `~/.azrael-ex`에 저장되며 일반 Codex의 `~/.codex`와 분리됩니다.
+
+이미 Release ZIP을 받은 경우 `pwsh -NoProfile -File ./azrael/install.ps1 -ArchivePath 'C:\path\azrael-windows-x64.zip'`으로 설치할 수 있습니다. `code`가 PATH에 없으면 `-CodePath 'C:\path\to\code.cmd'`를 지정합니다. 설치 전 파일만 준비하려면 `-PrepareOnly`를 추가합니다. 설치된 빌드 버전과 해시는 [release.json](azrael/release.json)에 고정되어 있습니다.
+
+이 절차는 Azrael 앱 설치입니다. 아래의 공통 지침·역할·스킬은 별도로 설치합니다. Release 호스트는 공식 Codex UI `26.917.62051`을 기준으로 빌드되었으며 Windows 로컬 실행용입니다.
 
 ## 전체 흐름
 
