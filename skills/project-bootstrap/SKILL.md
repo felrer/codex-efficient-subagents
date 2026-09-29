@@ -1,6 +1,6 @@
 ---
 name: project-bootstrap
-description: "Create or align project documentation entry points, configurable work locations with scripted brief/plan creation, and project playbook routing with the common Work playbook included by default. Use when explicitly bootstrapping or normalizing a project. Do not generate application scaffolding, detailed designs, or task plans."
+description: "Create or align project documentation entry points, configurable work locations with scripted work-plan creation, and project playbook routing with the common Work playbook included by default. Use when explicitly bootstrapping or normalizing a project. Do not generate application scaffolding, detailed designs, or task plans."
 ---
 
 # Project Bootstrap
@@ -24,7 +24,7 @@ Routers must have meaningful purposes and link only existing documents. Keep com
 
 For new projects, configure exactly one `Work directory: docs/work` bullet under `## Work Artifacts` in `docs/README.md`. This setting is the location authority: relative paths are project-root-relative, and absolute external paths are allowed. Markdown links are navigation and are resolved relative to their containing document.
 
-Create the work README during bootstrap but no tasks or example categories. It owns category meanings and usage rules, not a task/document index. Each classified folder such as `AA-08-title/` represents one work session for a specific target and contains numbered briefs; categories can advance independently to `AB-01`.
+Create the work README during bootstrap but no tasks or example categories. It owns category meanings and usage rules, not a task/document index. Each classified folder such as `AA-08-title/` holds one work session for a specific target, with one evolving numbered plan (`01-plan.md`, `02-plan.md`, …) per task; categories can advance independently to `AB-01`. Plan content and stages belong to the planning skill; do not restate them in project documents.
 
 Use [the work utility](../planning/scripts/work_artifacts.py) for deterministic creation, reuse, resolution, and configured location changes. Read [its compact usage contract](../planning/references/task-artifacts.md) only when invoking it. Do not reproduce allocation logic in the skill or manually calculate paths.
 
@@ -46,7 +46,7 @@ Improve common sources only within an authorized editing task, extracting reusab
 
 ## Verification And Completion
 
-Check that all seven entry points exist or route through agreed existing equivalents, links resolve, configured destinations agree, and empty-registration notices match reality. Verify that numbered-brief session rules are consistent and that playbooks route to operational owners without duplicating commands.
+Check that all seven entry points exist or route through agreed existing equivalents, links resolve, configured destinations agree, and empty-registration notices match reality. Verify that work-document rules describe one evolving numbered plan per task, consistent with the planning skill, and that playbooks route to operational owners without duplicating commands.
 
 Verify that common Work guidance is present in the imported file or the existing owner, that the playbook router points to that owner, and that provenance and local adaptations are recorded. Report explicit scope exclusions, unavailable sources, or unresolved policy conflicts instead of claiming the default inclusion is complete.
 

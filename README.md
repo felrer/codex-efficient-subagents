@@ -10,8 +10,12 @@ Codex에서 **요구사항 정리 → 설계 → 구현·검증**을 이어 가�
 
 ```mermaid
 flowchart TD
-    A[project-bootstrap: 프로젝트 문서 기반 준비] --> B[planning: 요구사항과 성공 조건 정리]
-    B --> C[사용자 확인]
+    A[project-bootstrap: 프로젝트 문서 기반 준비] --> B[planning: 요구사항·결정 사항 정리]
+    B --> B2{방향을 바꿀 수 있는 질문이 있는가?}
+    B2 -->|예| B3[답변 확인 후 조사 계속]
+    B2 -->|아니오| B4[구현 가능성 조사와 구현 계획]
+    B3 --> B4
+    B4 --> C[사용자의 계획 승인]
     C --> D{관련 설계 변경이 필요한가?}
     D -->|예| E[designing: 설계 문서 갱신]
     D -->|아니오| F[구현과 검증]
@@ -96,23 +100,23 @@ Codex를 다시 열고 다음을 확인합니다.
 
 > 모든 코드 수정 작업의 진입점입니다. 목표, 해결 방향, 동작 또는 범위에 미확정 사항이 있는 문제 해결·개선 요청에서 요구사항 정리, 사용자 승인, 설계 문서 수정, 구현과 평가까지 진행합니다.
 
-요청과 기존 근거를 확인해 목표·제약·성공 조건을 정리합니다. 레거시 코드·테스트·실행 스크립트의 정리 계획과 장기 작업의 파일 배치·관리도 포함합니다. 사용자 확인이 필요하거나 내용이 많으면 설정된 작업 위치에 brief를 남깁니다. 승인 후 필요한 설계 변경을 연결하고 구현·검증·정리 확인까지 진행합니다. 작업 위치가 없으면 대화에서 정리합니다.
+요청과 기존 설계·코드를 확인해 목표·제약·성공 조건과 검증 방법을 작업 계획 문서 하나(`nn-plan.md`)에 정리합니다. 문서 첫 줄에 현재 단계와 사용자가 할 일을 표시합니다. 사용자에게 보이는 동작, 범위, 호환성, 한도, 자원, 권한에 영향을 주는 선택은 권장안과 함께 결정 사항으로 제시합니다. 답에 따라 방향이 바뀔 질문이 있으면 깊은 조사 전에 먼저 확인받고, 코드 조사 후 구현 방식을 더해 계획 승인을 받습니다. 승인 후 designing으로 설계 문서를 갱신하고 구현·검증·정리까지 진행합니다. 구현 중 계획과 달라지면 계획을 먼저 고치고, 결정에 영향이 있으면 다시 묻습니다. 작업 위치가 없으면 대화에서 정리합니다.
 
-파일: [스킬](skills/planning/SKILL.md) · [작업 문서 규칙](skills/planning/references/task-artifacts.md) · [생성 유틸리티](skills/planning/scripts/work_artifacts.py)
+파일: [스킬](skills/planning/SKILL.md) · [작업 문서 규칙](skills/planning/references/task-artifacts.md) · [실행 준비](skills/planning/references/implementation-plans.md) · [생성 유틸리티](skills/planning/scripts/work_artifacts.py)
 
 ### designing
 
 > 승인된 요구사항을 제품·시스템의 동작과 구조로 구체화하고, 구현과 검토의 기준이 되는 설계 문서를 작성하거나 갱신합니다.
 
-합의된 요구사항을 바탕으로 동작, 데이터 의미, 구성요소의 책임, 실패·충돌 처리와 결정 이유를 담당 설계 문서에 반영합니다. 파일별 수정 목록을 나열하는 실행 계획과 구분합니다.
+합의된 요구사항을 바탕으로 동작, 데이터 의미, 구성요소의 책임, 실패·충돌 처리와 결정 이유를 담당 설계 문서에 반영합니다. 설계 문서에는 변경 이력 없이 최신 설계만 남기고, 상태는 문서·절 단위로 표시하며, 검증 근거는 작업 계획이나 운영 문서에 두고 링크합니다. 파일별 수정 목록을 나열하는 실행 계획과 구분합니다.
 
 파일: [스킬](skills/designing/SKILL.md)
 
 ### project-bootstrap
 
-> Create or align project documentation entry points, configurable work locations with scripted brief/plan creation, and project playbook routing with the common Work playbook included by default. Use when explicitly bootstrapping or normalizing a project. Do not generate application scaffolding, detailed designs, or task plans.
+> Create or align project documentation entry points, configurable work locations with scripted work-plan creation, and project playbook routing with the common Work playbook included by default. Use when explicitly bootstrapping or normalizing a project. Do not generate application scaffolding, detailed designs, or task plans.
 
-새 프로젝트에는 최소 문서 구조와 공용 작업 Playbook을 준비하고, 기존 프로젝트에는 내용을 보존하면서 필요한 진입점과 연결을 보완합니다. 동등한 작업 지침이 있으면 그 문서에 필요한 내용을 통합합니다. description의 `brief/plan` 표현과 달리 배포본의 작업 문서 규칙은 planning의 세션별 번호가 붙은 brief 체계를 사용합니다.
+새 프로젝트에는 최소 문서 구조와 공용 작업 Playbook을 준비하고, 기존 프로젝트에는 내용을 보존하면서 필요한 진입점과 연결을 보완합니다. 동등한 작업 지침이 있으면 그 문서에 필요한 내용을 통합합니다. 작업 문서는 planning과 같은 세션별 번호 plan 체계를 사용합니다.
 
 파일: [스킬](skills/project-bootstrap/SKILL.md) · [프로젝트 템플릿](skills/project-bootstrap/assets/project-template/)
 
@@ -152,34 +156,34 @@ bootstrap은 문서 진입점과 함께 [공용 작업 Playbook](skills/project-
 
 작업 Playbook은 승인된 계획에 명시한 레거시 호환만 허용하고, 미명시 시 해당 변경의 목표 스키마로 마이그레이션하도록 합니다. 재사용, 파일 구조 관리, 검증, 대체된 코드·테스트·스크립트의 정리와 완료 기준도 포함합니다. 프로젝트별 데이터 보호·배포 절차와 실행 권한은 계속 해당 프로젝트의 지침을 따릅니다.
 
-상세 설계와 작업 brief는 실제 작업이 생길 때 작성합니다. 다른 공통 playbook은 사용자가 제공하거나 선택한 자료에서 필요한 것만 가져옵니다. 다시 bootstrap을 실행할 때 기존 규칙과 비교해 반영하며 프로젝트별 수정을 자동으로 덮어쓰지 않습니다.
+상세 설계와 작업 계획은 실제 작업이 생길 때 작성합니다. 다른 공통 playbook은 사용자가 제공하거나 선택한 자료에서 필요한 것만 가져옵니다. 다시 bootstrap을 실행할 때 기존 규칙과 비교해 반영하며 프로젝트별 수정을 자동으로 덮어쓰지 않습니다.
 
 ## 첫 작업부터 완료까지
 
 검색 필터를 추가한다면 다음과 같이 진행합니다.
 
-1. **방향 정리:** `planning 스킬로 검색 필터 추가 방향을 먼저 정리해주세요.` 기존 검색 구조, 필터 조건, 성공 조건과 미확정 사항을 확인합니다.
-2. **피드백과 승인:** 제안된 동작을 검토하고 `이 범위로 진행해주세요`처럼 확정합니다. 수정 의견은 같은 brief에 반영합니다.
-3. **설계 반영:** 기존 설계의 변경이 필요하면 designing으로 담당 문서를 갱신합니다. 절차를 채우기 위한 설계 문서를 새로 만들지는 않습니다.
-4. **구현과 검증:** 메인 에이전트가 직접 수행하거나, 독립적인 범위와 파일 소유권을 정해 subagent에 맡깁니다.
-5. **결과 확인:** 변경 내용, 검증 범위·결과, 남은 제한을 확인합니다.
+1. **요구사항과 결정 사항:** `planning 스킬로 검색 필터 추가 방향을 먼저 정리해주세요.` 기존 검색 설계와 구조를 확인해 요구사항을 현재 설계 대비 변경점으로 쓰고, 결정 사항과 성공 조건을 정리합니다. 필터 종류처럼 답에 따라 방향이 바뀌는 질문이 있으면 여기서 먼저 답을 받습니다.
+2. **계획 승인:** 코드 조사 후 구현 방식과 검증 방법이 더해진 계획을 검토하고 `이 계획으로 진행해주세요`처럼 승인합니다. 질문에 답한 것만으로는 구현 승인으로 보지 않습니다. 수정 의견은 같은 plan에 반영합니다.
+3. **설계 반영:** 기존 설계의 변경이 필요하면 designing으로 담당 문서를 갱신하고, 필요 없으면 그 이유를 plan에 적습니다. 절차를 채우기 위한 설계 문서를 새로 만들지는 않습니다.
+4. **구현과 검증:** 메인 에이전트가 직접 수행하거나, 독립적인 범위와 파일 소유권을 정해 subagent에 맡깁니다. 계획과 달라져야 하면 plan을 먼저 고치고, 결정에 영향이 있으면 다시 확인합니다.
+5. **결과 확인:** 변경 내용, 검증 범위·결과, 남은 제한을 확인합니다. plan의 상태 줄과 최종 결과가 갱신되어 있어야 완료입니다.
 
-작업 위치가 설정되어 있고 brief가 필요한 경우의 예시입니다. 폴더 이름은 유틸리티가 할당하므로 직접 번호를 계산하지 않습니다.
+작업 위치가 설정되어 있는 경우의 예시입니다. 폴더 이름은 유틸리티가 할당하므로 직접 번호를 계산하지 않습니다.
 
 ```text
 docs/work/AA-01-search-filter/
-  01-brief.md  # 첫 작업의 요구사항과 피드백
-  02-brief.md  # 같은 세션에서 별개 후속 작업이 생겼을 때
+  01-plan.md  # 첫 작업의 요구사항, 결정 사항, 구현 계획, 검증 결과
+  02-plan.md  # 같은 세션에서 별개 후속 작업이 생겼을 때
 ```
 
-같은 작업의 피드백은 기존 brief를 갱신합니다. 별도 작업 세션은 새 폴더를 사용합니다. 설계 문서는 작업 기록과 분리해 관련 기능의 설계를 계속 관리합니다.
+같은 작업의 피드백과 조사 결과는 기존 plan을 갱신하며, 응답 이력을 따로 쌓지 않습니다. 별도 작업 세션은 새 폴더를 사용합니다. 이전 방식의 `nn-brief.md`는 그대로 두며 다음 plan 번호 계산에 포함됩니다. 설계 문서는 작업 기록과 분리해 관련 기능의 설계를 계속 관리합니다.
 
 ## 사용자별 조정
 
 | 항목 | 기본값과 변경 위치 |
 |---|---|
-| 탐색 역할 | `luna_explorer`: `gpt-5.6-luna`, `xhigh` |
-| 구현 역할 | `sol_executor`: `gpt-5.6-sol`, `medium` |
+| 탐색 역할 | `luna_explorer`: `gpt-6-luna`, `xhigh` |
+| 구현 역할 | `sol_executor`: `gpt-6-sol`, `medium` |
 | 동시 실행 한도 | `config.example.toml`의 8. 실제 작업량과 비용에 맞게 조정 |
 | 작업 문서 위치 | 프로젝트 `docs/README.md`의 `## Work Artifacts` 아래 `Work directory` |
 | 프로젝트 작업 지침 | 프로젝트의 `docs/playbooks/README.md`를 통해 필요한 문서만 연결 |
@@ -197,7 +201,7 @@ docs/work/AA-01-search-filter/
 | 스킬이 보이지 않음 | 설치 범위, 폴더 안의 SKILL.md, name/description, Codex 재시작 |
 | 동일 스킬이 두 개 보임 | 전역·프로젝트에 같은 이름으로 중복 설치했는지 |
 | subagent 실행 실패 | 역할 파일 인식, 설정 병합, 지정 모델 접근, 실행 환경의 위임 지원 |
-| brief 생성 실패 | Python 실행 가능 여부, 작업 위치 설정, 해당 경로의 쓰기 권한 |
+| 작업 계획 생성 실패 | Python 실행 가능 여부, 작업 위치 설정, 해당 경로의 쓰기 권한 |
 | bootstrap 참조 파일이 없음 | 세 스킬이 형제 폴더인지, scripts/references/assets를 함께 복사했는지 |
 
 이 저장소는 프롬프트와 작업 규칙을 공유합니다. 토큰 절감률이나 모든 환경에서 동일한 실행 결과를 보장하는 벤치마크는 아닙니다. 설정 형식과 실행 환경 차이는 [공식 subagent 안내](https://learn.chatgpt.com/docs/agent-configuration/subagents)를 함께 확인하세요.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Configure and safely create work-artifact sessions and briefs."""
+"""Configure and safely create work-artifact sessions and plans."""
 
 from __future__ import annotations
 
@@ -18,7 +18,8 @@ TASK_RE = re.compile(r"^(?P<category>[A-Z]{2})-(?P<number>0[1-9]|[1-9][0-9])-(?P
 TITLE_RE = re.compile(r"^[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*$")
 LINK_RE = re.compile(r"(?<!!)\[(?P<label>[^\]]+)\]\((?P<target>[^)]+)\)")
 LOCK_NAME = ".work-artifacts.lock"
-BRIEF_RE = re.compile(r"^(?P<number>[0-9]+)-brief\.md$")
+PLAN_RE = re.compile(r"^(?P<number>[0-9]+)-plan\.md$")
+LEGACY_BRIEF_RE = re.compile(r"^(?P<number>[0-9]+)-brief\.md$")
 
 
 class ArtifactError(ValueError):
@@ -155,11 +156,11 @@ def new_session(
     category: str | None,
     title: str,
     number: int | None,
-    brief_file: str,
+    plan_file: str,
 ) -> dict[str, object]:
     work, _ = resolve_work_directory(root)
-    brief_body = _body(brief_file, "brief")
-    assert brief_body is not None
+    plan_body = _body(plan_file, "plan")
+    assert plan_body is not None
     if category is not None and not re.fullmatch(r"[A-Z]{2}", category):
         raise ArtifactError("--category must contain exactly two uppercase letters")
     if not TITLE_RE.fullmatch(title):
@@ -190,9 +191,9 @@ def new_session(
         code = f"{chosen_category}-{chosen:02d}"
         session = work / f"{code}-{title}"
         session.mkdir()
-        brief = session / "01-brief.md"
+        plan = session / "01-plan.md"
         try:
-            _write_exclusive(brief, brief_body)
+            _write_exclusive(plan, plan_body)
         except BaseException:
             try:
                 session.rmdir()
@@ -203,31 +204,31 @@ def new_session(
             "code": code,
             "status": "created",
             "session": str(session.resolve()),
-            "brief_number": 1,
-            "brief": str(brief.resolve()),
+            "plan_number": 1,
+            "plan": str(plan.resolve()),
         }
 
 
-def new_brief(session_value: str, brief_file: str) -> dict[str, object]:
-    brief_body = _body(brief_file, "brief")
-    assert brief_body is not None
+def new_plan(session_value: str, plan_file: str) -> dict[str, object]:
+    plan_body = _body(plan_file, "plan")
+    assert plan_body is not None
     session, match = _session_path(session_value)
     with work_lock(session.parent):
         numbers = [
-            int(brief_match.group("number"))
+            int(plan_match.group("number"))
             for path in session.iterdir()
             if path.is_file()
-            if (brief_match := BRIEF_RE.fullmatch(path.name)) is not None
+            if (plan_match := PLAN_RE.fullmatch(path.name) or LEGACY_BRIEF_RE.fullmatch(path.name)) is not None
         ]
-        brief_number = max(numbers, default=0) + 1
-        brief = session / f"{brief_number:02d}-brief.md"
-        _write_exclusive(brief, brief_body)
+        plan_number = max(numbers, default=0) + 1
+        plan = session / f"{plan_number:02d}-plan.md"
+        _write_exclusive(plan, plan_body)
         return {
             "code": f"{match.group('category')}-{match.group('number')}",
             "status": "created",
             "session": str(session),
-            "brief_number": brief_number,
-            "brief": str(brief.resolve()),
+            "plan_number": plan_number,
+            "plan": str(plan.resolve()),
         }
 
 
@@ -327,17 +328,16 @@ def build_parser() -> argparse.ArgumentParser:
     session.add_argument("--title", required=True)
     session.add_argument("--category")
     session.add_argument("--number", type=int)
-    session.add_argument("--brief-file", required=True)
-    brief = sub.add_parser("new-brief")
-    brief.add_argument("--session", required=True)
-    brief.add_argument("--brief-file", required=True)
-    create = sub.add_parser("create", help="deprecated; use new-session or new-brief")
+    session.add_argument("--plan-file", required=True)
+    plan = sub.add_parser("new-plan")
+    plan.add_argument("--session", required=True)
+    plan.add_argument("--plan-file", required=True)
+    create = sub.add_parser("create", help="deprecated; use new-session or new-plan")
     create.add_argument("--project")
     create.add_argument("--task")
     create.add_argument("--category")
     create.add_argument("--title")
     create.add_argument("--number")
-    create.add_argument("--brief-file")
     create.add_argument("--plan-file")
     config = sub.add_parser("configure")
     config.add_argument("--project", required=True)
@@ -352,10 +352,10 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "create":
             raise ArtifactError(
                 "the create command is deprecated; use new-session to start a session "
-                "or new-brief to add a brief"
+                "or new-plan to add a plan"
             )
-        if args.command == "new-brief":
-            result = new_brief(args.session, args.brief_file)
+        if args.command == "new-plan":
+            result = new_plan(args.session, args.plan_file)
         else:
             root = project_root(args.project)
         if args.command == "resolve":
@@ -366,7 +366,7 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "new-session":
             result = new_session(
                 root, category=args.category, title=args.title, number=args.number,
-                brief_file=args.brief_file,
+                plan_file=args.plan_file,
             )
     except (ArtifactError, OSError) as error:
         parser.exit(1, f"work_artifacts: {error}\n")

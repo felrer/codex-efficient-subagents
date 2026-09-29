@@ -17,7 +17,7 @@ def main() -> int:
     parser.exit(
         1,
         "new_task_plan: deprecated and no files were created; use "
-        "work_artifacts.py new-session or new-brief\n",
+        "work_artifacts.py new-session or new-plan\n",
     )
 
 

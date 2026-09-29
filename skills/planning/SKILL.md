@@ -1,44 +1,52 @@
 ---
 name: planning
-description: 모든 코드 수정 작업의 진입점입니다. 목표, 해결 방향, 동작 또는 범위에 미확정 사항이 있는 문제 해결·개선 요청에서 요구사항 정리, 사용자 승인, 설계 문서 수정, 구현과 평가까지 진행합니다.
+description: Align user and agent goals for code changes, maintain a code-grounded work plan, and carry the agreed work through design, implementation, and verification.
 ---
 
 # Planning
 
-모든 코드 수정 작업은 이 흐름을 따릅니다.
+This skill defines the process for aligning the user's and agent's goals in code-change work and completing the work according to the agreed goal.
 
-## 1단계 — 요구사항 정리와 피드백
+## Work Plan Document
 
-대화와 관련 근거에서 사용자가 의도한 결과, 제약, 우선순위, 성공 조건을 파악하고 미확정 사항과 함께 제시합니다. 필요한 정보를 얻기 위한 작업은 목표를 구현하는 것보다 적은 시간에 가능하다면 진행할 수 있습니다.
+When user confirmation is required, manage the task's requirements through its implementation and verification results in a single work plan document. Name the work plan document `nn-plan.md`.
 
-규모가 크거나 장기간 진행되는 작업, 실험적인 작업에서는 주요 단계와 각 단계의 목적, 시간·연산 등 자원 제약, 다음 단계로 진행하거나 방향을 바꾸고 중단할 조건을 함께 정리합니다. 사용자가 제시하지 않은 자원 한도는 제안으로 구분합니다. 실험은 다음 판단에 필요한 최소 비교부터 시작하고, 결과에 따라 후속 범위를 정합니다. 이 내용은 현재 brief나 대화에 포함하며 별도 계획 문서나 상세 실행 체크리스트를 일률적으로 요구하지 않습니다.
+Write work plan documents in Korean. Keep code identifiers, file paths, and commands in their original form where needed.
 
-변경 범위에 영향을 받는 레거시 코드, 테스트 및 실행 스크립트의 정리 계획을 포함합니다. 유지할 항목은 현재 요구사항상 필요한 이유를 밝히고, 대체되거나 불필요해지는 항목은 제거 대상과 처리 시점을 정합니다. 임시 호환이나 마이그레이션 코드에는 종료 조건과 정리 시점을 명시합니다.
+Incorporate feedback and investigation findings about the same task into the current plan document instead of creating a new document. Create a new folder for a new target or a separate work session, and create the next numbered plan document for a distinct follow-up task in the same session. Store work plan documents in the location specified by the project, and use the [document creation tool](references/task-artifacts.md) to allocate new folders and file numbers.
 
-장기간 이어지는 작업에서는 기존 프로젝트 구조와 책임 경계를 기준으로 코드, 테스트, 실행 스크립트, 문서와 임시 산출물의 위치를 계획합니다. 관련 파일은 담당 기능이나 모듈에 모으고, 중복 구현·임시 파일·폐기된 파일이 누적되지 않도록 단계별 정리에 포함합니다. 파일 이동 시 참조와 실행 경로를 함께 갱신합니다. 예상되는 확장만을 이유로 사용하지 않는 디렉터리나 추상 계층을 미리 만들지 않습니다.
+Begin the document with a one-line status stating the current stage and what the user is expected to do next, such as awaiting requirement confirmation, awaiting plan approval, implementing, or completed with its verified scope. Update the status whenever the stage changes.
 
-사용자의 확인이 필요하거나 내용이 많다면 `nn-brief.md`에 정리해 제시합니다. 한 폴더는 특정 대상에 대한 한 작업 세션이며, 그 안의 brief들은 연속되는 개별 작업을 담습니다.
+The core items of a work plan document are user requirements, questions or decisions needed, and each success criterion with its verification method. Place questions that require the user's answer near the beginning of the document and word them so the user can answer them directly. The agent checks facts that can be established by examining code or other sources instead of asking the user. Integrate matters settled by the user's answer into the relevant requirements or plan, and remove the resolved questions.
 
-새로운 대상이나 별도 작업 세션을 시작하면 [work_artifacts.py](scripts/work_artifacts.py)의 `new-session`으로 폴더와 `01-brief.md`를 생성합니다. 같은 대상에 대한 같은 세션의 별개 후속 작업은 `new-brief`로 해당 폴더에 다음 번호의 brief를 생성합니다. 진행 중인 brief에 대한 피드백과 수정은 같은 파일에 반영합니다.
+A decision is any choice that affects user-visible behavior, scope, compatibility, limits, resources, or authority. Present such a choice as a decision with the recommended option and its trade-off, even when the agent has a clear recommendation. Do not settle it by describing it as part of the implementation approach.
 
-[작업 문서 규칙](references/task-artifacts.md)에 따라 세션 폴더와 현재 brief의 경로를 함께 유지합니다. 사용자가 brief 생성을 원하지 않으면 대화에서 내용을 정리합니다.
+Keep only currently valid content in the work plan document, and do not record user responses or the revision process as a separate history. Keep investigation evidence only to the extent needed for decisions in the plan, and refer to detailed logs or materials when needed instead of copying them into the document. Before appending new content, check whether an existing section can be revised or replaced, and remove duplicate or no longer valid statements.
 
-사용자가 제시한 내용을 승인하거나, 요구사항 이해를 맞추기 위한 내용 제시가 필요 없다고 말하면 2단계로 넘어갑니다. 그전에는 설계 문서 수정과 제품 구현을 시작하지 않습니다. 진행 중인 작업의 후속 요청도 이 단계에 반영합니다.
+## 1. Requirements
 
-## 2단계 — 설계 문서 수정
+Identify the desired outcome, constraints, and priorities from the user's request and prior conversation, and write the success criteria. When the work changes an existing feature, first read the design documents that own it and write the requirements as changes from the current design, so that unchanged behavior remains explicit. Connect each success criterion to a verification method; when project or user instructions limit verification scope to improve work speed, choose methods within that scope. If there is not yet enough evidence to choose a method, complete it after code investigation. Surface decisions that require the user's input as questions, and do not settle requirements arbitrarily before receiving the answer.
 
-승인된 구현 방향이 문서화된 동작·구조·계약을 바꾸는 경우 `designing` 스킬을 사용해 프로젝트에 존재하는 관련 설계 문서를 수정합니다. 관련 설계 문서의 변경이 필요하지 않으면 이 단계를 생략합니다. 절차를 충족하기 위한 설계 문서를 새로 만들지는 않습니다.
+If an open question could change the goal, scope, or direction enough to redirect the investigation, present the requirements and questions and wait for the user's answers before an in-depth feasibility investigation. Limit earlier investigation to what is needed to understand the request and write precise questions. Otherwise, continue to the investigation and confirm the requirements together with the plan.
 
-## 3단계 — 구현과 평가
+## 2. Feasibility Investigation
 
-설계 문서 수정이 끝났거나 필요하지 않으면 brief와 관련 설계 문서를 참고해 목표와 제약에 맞게 구현하고, 결과물을 평가해 보고합니다.
+Inspect the actual code's call paths, owners, data and state contracts, and relevant tests to determine how the requirements could be implemented in the current structure. Review existing code, platform features, installed dependencies, and reusable libraries to determine what to change and what to reuse. When inspection cannot resolve a material uncertainty, use a narrowly scoped experiment and distinguish experimental findings from behavior verified in the product. Record established facts, unverified assumptions, and blocking conditions separately in the same plan document.
 
-구현 전에 프로젝트의 구현 관련 playbook을 확인하고 해당 작업에 적용되는 지침을 따릅니다.
+If the requirements cannot be met as stated, or only at a cost the user may not accept, present the feasible options and their trade-offs as a decision instead of choosing a compromise.
 
-새 코드를 추가하거나 기존 코드를 대체하기 전에 해당 흐름을 담당하는 기존 코드, 표준 라이브러리·플랫폼 기능, 설치된 의존성과 성숙한 재사용 대안을 확인합니다. 요구사항을 충족하는 기존 구현을 재사용하거나 확장하고, 충족되지 않는 부분에만 필요한 최소 변경을 적용합니다.
+## 3. Confirm The Work Plan
 
-구현 전에 프로젝트의 해당 검증 지침과 유효한 기존 근거를 확인해, 성공 조건과 중요한 위험을 판단할 최소 검증을 정합니다. 테스트뿐 아니라 문서 비교, 화면 확인, 데이터 검사, 실험 평가 중 작업에 맞는 방법을 선택합니다. 같은 사실을 확인하는 검사를 중복하지 않으며, 새로운 위험이나 실패 또는 프로젝트 요구가 있을 때 검증 범위를 넓힙니다. 검사 실패를 이유로 합의된 요구사항이나 품질 기준을 임의로 낮추지 않습니다.
+Use the code investigation to add the implementation approach, main work sequence, migration and cleanup scope, and verification methods to the plan document. Use [execution preparation](references/implementation-plans.md) for the parts relevant to the change. Before presenting the plan, move choices in the approach that meet the definition of a decision into the decisions section. If the findings require a change to the user's goal, scope, constraints, or success criteria, ask the user and revise the plan.
 
-계획한 정리를 수행했는지 확인하고, 남은 항목은 유지 근거와 제거 조건을 보고합니다.
+Present the plan with its requirements and implementation approach to the user for confirmation before changing design documents or product code. Answers to questions settle those decisions but do not by themselves approve implementation. If an answer materially changes the plan, present the revised plan for confirmation.
 
-합의된 결과를 뒷받침하는 검증 근거와 적용되는 필수 확인이 갖춰졌을 때 완료로 보고합니다. 확인한 범위와 결과, 미확인 사항과 남은 작업을 구분하고, 일부 검사 통과를 전체 작업 완료로 해석하지 않습니다.
+## 4. Update Design Documents
+
+When the confirmed plan changes product behavior, structure, or contracts, use the `designing` skill to update the owning design documents before implementing the change. If no design document needs to change, state the reason in the plan document. Reflect the agreed target design without copying the plan's investigation process or user-response history.
+
+## 5. Implement, Verify, And Complete
+
+Implement against the plan and relevant design documents, following the project's work and verification instructions. When implementation requires a departure from the plan, update the plan first. If the departure affects a decision, success criterion, or user-visible result, ask the user before continuing, and keep the design documents consistent with the confirmed result. Check each success criterion using the agreed method, and remove code, tests, and temporary paths made unnecessary by the change.
+
+The work is complete when the success criteria have been checked, design documents match the implemented result, and the plan's status and final results are recorded. In the report, distinguish the scope and results actually verified from remaining unknowns.

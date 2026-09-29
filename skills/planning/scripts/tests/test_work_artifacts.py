@@ -57,7 +57,7 @@ class WorkArtifactsTests(unittest.TestCase):
         data = json.loads(result.stdout)
         self.assertEqual(data, {"status": "resolved", "task": str(self.work.resolve())})
 
-    def write_body(self, name: str = "brief.md", body: str = "# Brief\nDetails\n") -> Path:
+    def write_body(self, name: str = "plan.md", body: str = "# Plan\nDetails\n") -> Path:
         source = self.base / name
         source.write_text(body, encoding="utf-8")
         return source
@@ -66,32 +66,32 @@ class WorkArtifactsTests(unittest.TestCase):
         body = self.write_body(f"{title}-{len(list(self.base.glob('*.md')))}.md")
         return json.loads(self.run_cli(
             "new-session", "--project", str(self.project), "--title", title,
-            "--brief-file", str(body), *extra,
+            "--plan-file", str(body), *extra,
         ).stdout)
 
     def test_new_session_always_creates_and_preserves_unicode_body(self) -> None:
-        brief_source = self.base / "brief.txt"
-        brief_source.write_text("# 브리프\n내용 🌱\n", encoding="utf-8")
+        plan_source = self.base / "plan.txt"
+        plan_source.write_text("# 계획\n내용 🌱\n", encoding="utf-8")
         first = json.loads(self.run_cli(
             "new-session", "--project", str(self.project), "--title", "same",
-            "--brief-file", str(brief_source),
+            "--plan-file", str(plan_source),
         ).stdout)
         second = json.loads(self.run_cli(
             "new-session", "--project", str(self.project), "--title", "same",
-            "--brief-file", str(brief_source),
+            "--plan-file", str(plan_source),
         ).stdout)
         self.assertEqual(first["code"], "AA-01")
         self.assertEqual(second["code"], "AB-01")
         self.assertNotEqual(first["session"], second["session"])
-        self.assertEqual(first["brief_number"], 1)
-        self.assertEqual(Path(first["brief"]).read_text(encoding="utf-8"), "# 브리프\n내용 🌱\n")
+        self.assertEqual(first["plan_number"], 1)
+        self.assertEqual(Path(first["plan"]).read_text(encoding="utf-8"), "# 계획\n내용 🌱\n")
 
     def test_explicit_category_allocates_numbers_and_occupied_code_fails(self) -> None:
         custom = self.new_session("custom", "--category", "UI")
         continued = self.new_session("continued", "--category", "UI")
         conflict = self.run_cli(
             "new-session", "--project", str(self.project), "--category", "UI",
-            "--number", "1", "--title", "custom", "--brief-file", str(self.write_body()), ok=False,
+            "--number", "1", "--title", "custom", "--plan-file", str(self.write_body()), ok=False,
         )
         self.assertEqual(custom["code"], "UI-01")
         self.assertEqual(continued["code"], "UI-02")
@@ -101,42 +101,42 @@ class WorkArtifactsTests(unittest.TestCase):
     def test_number_requires_explicit_category(self) -> None:
         result = self.run_cli(
             "new-session", "--project", str(self.project), "--title", "numbered",
-            "--number", "8", "--brief-file", str(self.write_body()), ok=False,
+            "--number", "8", "--plan-file", str(self.write_body()), ok=False,
         )
         self.assertEqual(result.returncode, 1)
         self.assertIn("requires an explicit --category", result.stderr)
 
-    def test_new_brief_uses_max_plus_one_supports_100_and_ignores_plan(self) -> None:
+    def test_new_plan_counts_legacy_briefs_and_ignores_other_files(self) -> None:
         created = self.new_session("history")
         session = Path(created["session"])
         (session / "03-brief.md").write_text("old", encoding="utf-8")
         (session / "99-brief.md").write_text("old", encoding="utf-8")
-        (session / "02-plan.md").write_text("legacy", encoding="utf-8")
+        (session / "02-notes.md").write_text("other", encoding="utf-8")
         body = self.write_body("followup.md", "후속 내용\n")
         result = json.loads(self.run_cli(
-            "new-brief", "--session", str(session.resolve()), "--brief-file", str(body),
+            "new-plan", "--session", str(session.resolve()), "--plan-file", str(body),
         ).stdout)
-        self.assertEqual(result["brief_number"], 100)
-        self.assertEqual(Path(result["brief"]).name, "100-brief.md")
-        self.assertEqual(Path(result["brief"]).read_text(encoding="utf-8"), "후속 내용\n")
-        self.assertFalse((session / "02-brief.md").exists())
+        self.assertEqual(result["plan_number"], 100)
+        self.assertEqual(Path(result["plan"]).name, "100-plan.md")
+        self.assertEqual(Path(result["plan"]).read_text(encoding="utf-8"), "후속 내용\n")
+        self.assertFalse((session / "02-plan.md").exists())
 
         plan_only = Path(self.new_session("plan-only")["session"])
-        (plan_only / "02-plan.md").write_text("legacy", encoding="utf-8")
+        (plan_only / "02-notes.md").write_text("other", encoding="utf-8")
         second = json.loads(self.run_cli(
-            "new-brief", "--session", str(plan_only), "--brief-file", str(body),
+            "new-plan", "--session", str(plan_only), "--plan-file", str(body),
         ).stdout)
-        self.assertEqual(second["brief_number"], 2)
+        self.assertEqual(second["plan_number"], 2)
 
     def test_traversal_and_empty_body_fail_without_partial_output(self) -> None:
         traversal = self.run_cli(
             "new-session", "--project", str(self.project), "--title", "../escape",
-            "--brief-file", str(self.write_body()), ok=False,
+            "--plan-file", str(self.write_body()), ok=False,
         )
         empty = self.write_body("empty.md", " \n")
         empty_result = self.run_cli(
             "new-session", "--project", str(self.project), "--title", "empty",
-            "--brief-file", str(empty), ok=False,
+            "--plan-file", str(empty), ok=False,
         )
         self.assertEqual(traversal.returncode, 1)
         self.assertIn("slug", traversal.stderr)
@@ -144,12 +144,12 @@ class WorkArtifactsTests(unittest.TestCase):
         self.assertFalse((self.project / "docs" / "escape").exists())
         self.assertEqual([path.name for path in self.work.iterdir() if path.is_dir()], [])
 
-    def test_invalid_new_brief_input_leaves_session_unchanged(self) -> None:
+    def test_invalid_new_plan_input_leaves_session_unchanged(self) -> None:
         session = Path(self.new_session("unchanged")["session"])
         empty = self.write_body("empty-followup.md", "\n")
         before = sorted(path.name for path in session.iterdir())
         result = self.run_cli(
-            "new-brief", "--session", str(session), "--brief-file", str(empty), ok=False,
+            "new-plan", "--session", str(session), "--plan-file", str(empty), ok=False,
         )
         self.assertEqual(result.returncode, 1)
         self.assertIn("is empty", result.stderr)
@@ -219,13 +219,13 @@ class WorkArtifactsTests(unittest.TestCase):
         new_work.mkdir()
         (new_work / "README.md").write_text("# New\n", encoding="utf-8")
         self.run_cli("configure", "--project", str(self.project), "--directory", str(new_work.resolve()))
-        body = self.write_body("body.md", "# Continued brief\n")
+        body = self.write_body("body.md", "# Continued plan\n")
         result = json.loads(self.run_cli(
-            "new-brief", "--session", str(session.resolve()), "--brief-file", str(body),
+            "new-plan", "--session", str(session.resolve()), "--plan-file", str(body),
         ).stdout)
         self.assertEqual(result["code"], "AA-04")
-        self.assertEqual(result["brief_number"], 2)
-        self.assertTrue((session / "02-brief.md").is_file())
+        self.assertEqual(result["plan_number"], 2)
+        self.assertTrue((session / "02-plan.md").is_file())
 
     def test_legacy_commands_fail_with_guidance_without_mutation(self) -> None:
         before = sorted(path.name for path in self.work.rglob("*"))
@@ -239,15 +239,15 @@ class WorkArtifactsTests(unittest.TestCase):
         self.assertEqual(create.returncode, 1)
         self.assertIn("new-session", create.stderr)
         self.assertEqual(legacy.returncode, 1)
-        self.assertIn("new-brief", legacy.stderr)
+        self.assertIn("new-plan", legacy.stderr)
         self.assertEqual(sorted(path.name for path in self.work.rglob("*")), before)
 
-    def test_concurrent_new_briefs_are_unique_or_retry_after_lock(self) -> None:
+    def test_concurrent_new_plans_are_unique_or_retry_after_lock(self) -> None:
         session = Path(self.new_session("concurrent")["session"])
-        body = self.write_body("concurrent-body.md", "Concurrent brief\n")
+        body = self.write_body("concurrent-body.md", "Concurrent plan\n")
         command = [
-            sys.executable, "-B", str(SCRIPT), "new-brief",
-            "--session", str(session), "--brief-file", str(body),
+            sys.executable, "-B", str(SCRIPT), "new-plan",
+            "--session", str(session), "--plan-file", str(body),
         ]
         processes = [
             subprocess.Popen(command, text=True, encoding="utf-8", stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -258,17 +258,17 @@ class WorkArtifactsTests(unittest.TestCase):
         lock_failures = 0
         for stdout, stderr, returncode in results:
             if returncode == 0:
-                numbers.append(json.loads(stdout)["brief_number"])
+                numbers.append(json.loads(stdout)["plan_number"])
             else:
                 self.assertIn("is locked", stderr)
                 lock_failures += 1
         for _ in range(lock_failures):
             retried = json.loads(self.run_cli(
-                "new-brief", "--session", str(session), "--brief-file", str(body),
+                "new-plan", "--session", str(session), "--plan-file", str(body),
             ).stdout)
-            numbers.append(retried["brief_number"])
+            numbers.append(retried["plan_number"])
         self.assertEqual(sorted(numbers), list(range(2, 10)))
-        self.assertEqual(len({path.name for path in session.glob("*-brief.md")}), 9)
+        self.assertEqual(len({path.name for path in session.glob("*-plan.md")}), 9)
 
     def test_missing_duplicate_config_and_lock_fail_clearly(self) -> None:
         docs = self.project / "docs" / "README.md"
@@ -283,7 +283,7 @@ class WorkArtifactsTests(unittest.TestCase):
         (self.work / wa.LOCK_NAME).mkdir()
         locked = self.run_cli(
             "new-session", "--project", str(self.project), "--title", "locked",
-            "--brief-file", str(self.write_body()), ok=False,
+            "--plan-file", str(self.write_body()), ok=False,
         )
         self.assertEqual(locked.returncode, 1)
         self.assertIn("is locked", locked.stderr)
