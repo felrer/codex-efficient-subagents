@@ -1,6 +1,6 @@
 name = "sol_executor"
 description = "Bounded implementation and validation after behavior and scope are settled. Own assigned files and preserve other work. Not for requirements, architecture, or user decisions."
-model = "gpt-5.6-sol"
+model = "gpt-6-sol"
 model_reasoning_effort = "medium"
 
 developer_instructions = """
