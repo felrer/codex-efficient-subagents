@@ -8,7 +8,7 @@ Codex에서 **요구사항 정리 → 설계 → 구현·검증**을 이어 가�
 
 ## Azrael 설치 (Windows x64)
 
-[최신 Azrael Release](https://github.com/felrer/codex-efficient-subagents/releases/tag/azrael-2026-09-29)는 독립 VS Code 호스트, 엔진, OpenAI/Devin provider 실행 파일을 포함합니다. Windows x64 로컬 환경에서 VS Code 1.96.2 이상, PowerShell 7, Node.js 22.18 이상, Git을 준비하고 `code`, `node`, `pwsh` 명령을 실행할 수 있게 합니다. 설치에는 약 2 GB의 여유 공간과 GitHub 다운로드 연결이 필요합니다.
+[최신 Azrael Release](https://github.com/felrer/codex-efficient-subagents/releases/tag/azrael-2026-09-30)는 독립 VS Code 호스트, 엔진, OpenAI/Devin provider 실행 파일을 포함합니다. Windows x64 로컬 환경에서 VS Code 1.96.2 이상, PowerShell 7, Node.js 22.18 이상, Git을 준비하고 `code`, `node`, `pwsh` 명령을 실행할 수 있게 합니다. 설치에는 약 2 GB의 여유 공간과 GitHub 다운로드 연결이 필요합니다.
 
 ```powershell
 git clone https://github.com/felrer/codex-efficient-subagents.git
